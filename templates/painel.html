@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block titulo %}Hoje{% endblock %}
+{% block conteudo %}
+<h1>{{ data_extenso }}</h1>
+
+{% if not tem_medicamentos %}
+  <section class="vazio">
+    <h2>Nenhum medicamento cadastrado ainda</h2>
+    <p>Cadastre o primeiro medicamento para ver aqui os horários do dia.</p>
+    <div class="acoes">
+      <a class="btn verde" href="{{ url_for('novo_medicamento') }}">Cadastrar medicamento</a>
+      <form method="post" action="{{ url_for('carregar_exemplo') }}">
+        <button class="btn contorno" type="submit">Ver com dados de exemplo (fictícios)</button>
+      </form>
+    </div>
+  </section>
+{% else %}
+
+  {% if alertas %}
+  <section class="alerta" aria-label="Avisos de estoque">
+    <h2>Atenção ao estoque</h2>
+    <ul>
+      {% for m in alertas %}
+        <li><strong>{{ m.nome }}</strong>:
+          {% if m.estoque.situacao == 'acabou' %}acabou.{% else %}restam {{ m.quantidade }} unidade(s){% if m.estoque.dias is not none %}, o suficiente para cerca de {{ m.estoque.dias }} dia(s){% endif %}.{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <a href="{{ url_for('estoque') }}">Ir para o estoque</a>
+  </section>
+  {% endif %}
+
+  <section>
+    <div class="titulo-linha">
+      <h2>Doses de hoje</h2>
+      {% if resumo.total %}<p class="suave">{{ resumo.tomou }} de {{ resumo.total }} registradas como tomadas</p>{% endif %}
+    </div>
+
+    <p id="avisos-navegador" class="caixa-azul" hidden>
+      <span>Quer receber um aviso do navegador na hora de cada dose? Isso só funciona com esta página aberta.</span>
+      <button type="button" class="btn azul" id="ativar-avisos">Ativar avisos</button>
+    </p>
+
+    {% if doses %}
+    <ul class="lista-doses">
+      {% for d in doses %}
+      <li class="dose {{ d.status }}" data-hora="{{ d.horario }}" data-nome="{{ d.med.nome }}" data-status="{{ d.status }}">
+        <div class="hora">{{ d.horario }}</div>
+        <div class="info">
+          <strong>{{ d.med.nome }}</strong>
+          <span class="suave">{{ d.med.unidades_por_dose }} unidade(s){% if d.med.dosagem %} · {{ d.med.dosagem }}{% endif %}</span>
+          {% if d.med.exemplo %}<span class="selo-exemplo">Exemplo (fictício)</span>{% endif %}
+          <span class="atraso" hidden>Horário já passou</span>
+        </div>
+        <form class="botoes-dose" method="post" action="{{ url_for('registrar_dose') }}">
+          <input type="hidden" name="medicamento_id" value="{{ d.med.id }}">
+          <input type="hidden" name="horario" value="{{ d.horario }}">
+          {% if d.status == 'pendente' %}
+            <button class="btn verde" name="status" value="tomou">Tomei</button>
+            <button class="btn contorno" name="status" value="nao_tomou">Não tomei</button>
+          {% else %}
+            <span class="chip {{ d.status }}">{{ rotulos_status[d.status] }}</span>
+            <button class="btn-link" name="status" value="pendente">Desfazer</button>
+          {% endif %}
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+      <p class="vazio-simples">Nenhuma dose prevista para hoje.</p>
+    {% endif %}
+    <p class="suave pequeno">O registro é feito por você ou por quem cuida de você. O sistema não confirma se o remédio foi realmente tomado.</p>
+  </section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='lembretes.js') }}"></script>{% endblock %}

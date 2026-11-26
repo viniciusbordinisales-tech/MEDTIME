@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}MEDTIME{% endblock %} – MEDTIME</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <a class="pular" href="#conteudo">Ir para o conteúdo</a>
+  <header class="topo">
+    <a class="marca" href="{{ url_for('painel') }}" aria-label="MEDTIME, página inicial">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <circle cx="17" cy="17" r="16" fill="#1F7A52"/>
+        <circle cx="17" cy="17" r="11" fill="#fff"/>
+        <path d="M17 10v7l4.5 3" stroke="#1B5E8C" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>MEDTIME</span>
+    </a>
+    <nav class="menu" aria-label="Principal">
+      {% for destino, rotulo in menu %}
+        <a href="{{ url_for(destino) }}" {% if request.endpoint == destino or (destino == 'medicamentos' and request.endpoint in ('novo_medicamento','editar_medicamento')) %}class="ativo" aria-current="page"{% endif %}>{{ rotulo }}</a>
+      {% endfor %}
+    </nav>
+  </header>
+
+  <main id="conteudo" class="conteudo">
+    {% for categoria, mensagem in get_flashed_messages(with_categories=true) %}
+      <p class="aviso {{ categoria }}" role="status">{{ mensagem }}</p>
+    {% endfor %}
+    {% block conteudo %}{% endblock %}
+  </main>
+
+  <footer class="rodape">
+    O MEDTIME ajuda a organizar horários e estoque. Ele não receita, não altera doses e não substitui a orientação de um médico ou farmacêutico.
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

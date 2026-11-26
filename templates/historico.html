@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Histórico{% endblock %}
+{% block conteudo %}
+<h1>Histórico de doses</h1>
+
+<nav class="filtro" aria-label="Período">
+  {% for d in (7, 30, 90) %}
+    <a href="{{ url_for('historico', dias=d) }}" {% if d == dias %}class="ativo" aria-current="true"{% endif %}>Últimos {{ d }} dias</a>
+  {% endfor %}
+</nav>
+
+<p class="resumo">
+  <span class="chip verde">{{ total.tomou }} tomou</span>
+  <span class="chip neutro">{{ total.nao_tomou }} não tomou</span>
+  <span class="chip laranja">{{ total.sem_registro }} sem registro</span>
+</p>
+
+{% if grupos %}
+  {% for g in grupos %}
+  <section class="dia">
+    <h2>{{ g.dia|dia_curto }}</h2>
+    <ul class="lista-simples">
+      {% for i in g.itens %}
+      <li>
+        <span class="hora-pequena">{{ i.horario }}</span>
+        <span>{{ i.med.nome }}{% if i.med.exemplo %} <span class="selo-exemplo">Exemplo (fictício)</span>{% endif %}</span>
+        <span class="chip {{ i.status }}">{{ rotulos_status[i.status] }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+{% else %}
+  <p class="vazio-simples">Ainda não há doses neste período.</p>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='lembretes.js') }}"></script>{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titulo %}Consulta{% endblock %}
+{% block conteudo %}
+<h1>Consulta de informações oficiais</h1>
+<p>Nesta versão, esta página leva ao site oficial de cada fonte. A integração com os dados será definida depois de verificarmos como cada fonte disponibiliza as informações.</p>
+
+<ul class="cartoes">
+  <li class="cartao">
+    <h2>Bulas e informações do medicamento</h2>
+    <p class="suave">Bulário Eletrônico da ANVISA.</p>
+    <a class="btn azul" href="https://consultas.anvisa.gov.br/#/bulario/" target="_blank" rel="noopener">Abrir o Bulário (ANVISA)</a>
+  </li>
+  <li class="cartao">
+    <h2>Medicamentos registrados</h2>
+    <p class="suave">Consultas de produtos da ANVISA.</p>
+    <a class="btn azul" href="https://consultas.anvisa.gov.br/" target="_blank" rel="noopener">Abrir consultas (ANVISA)</a>
+  </li>
+  <li class="cartao">
+    <h2>Preço máximo de referência</h2>
+    <p class="suave">Lista de preços da CMED. É o valor máximo permitido, não o preço cobrado pela farmácia.</p>
+    <a class="btn azul" href="https://www.gov.br/anvisa/pt-br/assuntos/medicamentos/cmed/precos" target="_blank" rel="noopener">Abrir lista da CMED</a>
+  </li>
+</ul>
+<p class="suave pequeno">Em caso de dúvida sobre o uso de um medicamento, fale com seu médico ou farmacêutico.</p>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='lembretes.js') }}"></script>{% endblock %}

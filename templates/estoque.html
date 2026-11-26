@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Estoque{% endblock %}
+{% block conteudo %}
+<h1>Estoque</h1>
+<p class="suave">A estimativa de dias considera os horários e as unidades por dose de cada medicamento.</p>
+
+{% if meds %}
+<ul class="cartoes">
+  {% for m in meds %}
+  <li class="cartao {% if m.estoque.situacao != 'ok' %}cartao-alerta{% endif %}">
+    <div class="cartao-topo">
+      <h2>{{ m.nome }}</h2>
+      {% if m.exemplo %}<span class="selo-exemplo">Exemplo (fictício)</span>{% endif %}
+    </div>
+    <p class="numero-grande">{{ m.quantidade }} <span>unidade(s)</span></p>
+    <p>
+      {% if m.estoque.situacao == 'acabou' %}<span class="chip laranja">Acabou</span>
+      {% elif m.estoque.situacao == 'baixo' %}<span class="chip laranja">Estoque baixo</span>
+      {% else %}<span class="chip verde">Estoque ok</span>{% endif %}
+      {% if m.estoque.dias is not none and m.quantidade > 0 %}Dá para cerca de {{ m.estoque.dias }} dia(s).{% endif %}
+    </p>
+    <form method="post" action="{{ url_for('repor_estoque', med_id=m.id) }}" class="linha-repor">
+      <label>Recebi mais unidades
+        <input type="number" name="adicionar" min="1" inputmode="numeric" placeholder="Ex.: 30" required>
+      </label>
+      <button class="btn verde" type="submit">Adicionar ao estoque</button>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+  <p class="vazio-simples">Cadastre um medicamento para acompanhar o estoque. <a href="{{ url_for('novo_medicamento') }}">Cadastrar agora</a></p>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='lembretes.js') }}"></script>{% endblock %}

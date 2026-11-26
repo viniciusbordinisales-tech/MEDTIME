@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block titulo %}Remédios{% endblock %}
+{% block conteudo %}
+<div class="titulo-linha">
+  <h1>Meus remédios</h1>
+  <a class="btn verde" href="{{ url_for('novo_medicamento') }}">Cadastrar novo</a>
+</div>
+
+{% if meds %}
+<ul class="cartoes">
+  {% for m in meds %}
+  <li class="cartao">
+    <div class="cartao-topo">
+      <h2>{{ m.nome }}</h2>
+      {% if m.exemplo %}<span class="selo-exemplo">Exemplo (fictício)</span>{% endif %}
+    </div>
+    <p class="suave">{{ m.unidades_por_dose }} unidade(s) por dose{% if m.dosagem %} · {{ m.dosagem }}{% endif %}</p>
+    <p class="horarios">{% for h in m.lista_horarios %}<span class="chip azul">{{ h }}</span>{% endfor %}</p>
+    <p>
+      Tratamento:
+      {% if m.fim %}de {{ m.data_inicio|data_br }} até {{ m.fim|data_br }}{% else %}uso contínuo, desde {{ m.data_inicio|data_br }}{% endif %}
+    </p>
+    <p>
+      Estoque: <strong>{{ m.quantidade }}</strong> unidade(s)
+      {% if m.estoque.situacao == 'baixo' %}<span class="chip laranja">Estoque baixo</span>{% elif m.estoque.situacao == 'acabou' %}<span class="chip laranja">Acabou</span>{% endif %}
+    </p>
+    {% if m.observacoes and not m.exemplo %}<p class="suave">{{ m.observacoes }}</p>{% endif %}
+    <div class="acoes">
+      <a class="btn contorno" href="{{ url_for('editar_medicamento', med_id=m.id) }}">Editar</a>
+      <form method="post" action="{{ url_for('excluir_medicamento', med_id=m.id) }}" data-confirmar="Excluir {{ m.nome }}? O histórico de doses dele também será apagado.">
+        <button class="btn perigo" type="submit">Excluir</button>
+      </form>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% if meds|selectattr('exemplo')|list %}
+  <form method="post" action="{{ url_for('remover_exemplo') }}" class="rodape-lista">
+    <button class="btn contorno" type="submit">Remover dados de exemplo (fictícios)</button>
+  </form>
+{% endif %}
+{% else %}
+<section class="vazio">
+  <h2>Nada cadastrado</h2>
+  <p>Cadastre seus medicamentos para organizar horários e estoque.</p>
+  <div class="acoes">
+    <a class="btn verde" href="{{ url_for('novo_medicamento') }}">Cadastrar medicamento</a>
+    <form method="post" action="{{ url_for('carregar_exemplo') }}">
+      <button class="btn contorno" type="submit">Ver com dados de exemplo (fictícios)</button>
+    </form>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='lembretes.js') }}"></script>{% endblock %}

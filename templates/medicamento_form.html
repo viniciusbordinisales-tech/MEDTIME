@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block titulo %}{% if editando %}Editar medicamento{% else %}Novo medicamento{% endif %}{% endblock %}
+{% block conteudo %}
+<h1>{% if editando %}Editar medicamento{% else %}Cadastrar medicamento{% endif %}</h1>
+<p class="suave">Preencha com o que está na receita ou na embalagem. O MEDTIME não sugere doses.</p>
+
+{% if med.exemplo %}<p class="aviso">Este é um medicamento de exemplo (fictício).</p>{% endif %}
+{% if erros %}
+<div class="aviso erro" role="alert">
+  <strong>Revise os campos:</strong>
+  <ul>{% for e in erros %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<form method="post" class="formulario">
+  <label>Nome do medicamento
+    <input type="text" name="nome" value="{{ med.nome }}" required maxlength="80" autocomplete="off">
+  </label>
+  <label>Dosagem ou apresentação <span class="suave">(opcional)</span>
+    <input type="text" name="dosagem" value="{{ med.dosagem }}" maxlength="80" placeholder="Ex.: comprimido de 500 mg">
+  </label>
+
+  <div class="duas-colunas">
+    <label>Unidades por dose
+      <input type="number" name="unidades_por_dose" value="{{ med.unidades_por_dose }}" min="1" required inputmode="numeric">
+    </label>
+    <label>Quantidade disponível
+      <input type="number" name="quantidade" value="{{ med.quantidade }}" min="0" required inputmode="numeric">
+    </label>
+  </div>
+  <label>Avisar quando restar até esta quantidade
+    <input type="number" name="quantidade_minima" value="{{ med.quantidade_minima }}" min="0" required inputmode="numeric">
+  </label>
+
+  <fieldset>
+    <legend>Horários</legend>
+    <div id="horarios">
+      {% for h in med.lista_horarios %}
+        <div class="linha-horario"><input type="time" name="horario" value="{{ h }}" aria-label="Horário"><button type="button" class="btn-link remover-horario">Remover</button></div>
+      {% endfor %}
+    </div>
+    <button type="button" class="btn contorno" id="add-horario">Adicionar horário</button>
+  </fieldset>
+
+  <div class="duas-colunas">
+    <label>Início do tratamento
+      <input type="date" name="data_inicio" value="{{ med.data_inicio }}" required>
+    </label>
+    <label>Duração em dias <span class="suave">(vazio = uso contínuo)</span>
+      <input type="number" name="duracao_dias" value="{{ med.duracao_dias }}" min="1" inputmode="numeric">
+    </label>
+  </div>
+
+  <label>Observações <span class="suave">(opcional)</span>
+    <textarea name="observacoes" rows="3" maxlength="300" placeholder="Ex.: tomar após o café da manhã, conforme a receita">{{ med.observacoes }}</textarea>
+  </label>
+
+  <div class="acoes">
+    <button class="btn verde" type="submit">{% if editando %}Salvar alterações{% else %}Salvar medicamento{% endif %}</button>
+    <a class="btn contorno" href="{{ url_for('medicamentos') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='lembretes.js') }}"></script>{% endblock %}
